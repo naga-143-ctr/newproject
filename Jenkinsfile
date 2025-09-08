@@ -23,6 +23,10 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
+                          docker exec -u root -it jenkincont bash
+                           groupadd docker || true    
+                           usermod -aG docker jenkins 
+                           exit
                     docker rmi -f hotstar:v1 || true
                     docker build -t hotstar:v1 -f /var/lib/jenkins/workspace/newproject/Dockerfile /var/lib/jenkins/workspace/newproject
                 '''
