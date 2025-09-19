@@ -1,46 +1,28 @@
 pipeline {
     agent any
-
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from main branch
-                git branch: 'main', url: 'https://github.com/LakshayD02/Hotstar-Clone.git'
-
-                // Verify files
-                sh 'pwd'
-                sh 'ls -l'
-                sh 'ls -R'
+                git 'https://github.com/yourrepo/webpage.git'  // web page code
             }
         }
-
-        stage('Build WAR') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh '''
-                          docker exec -u root -it jenkincont bash
-                           groupadd docker || true    
-                           usermod -aG docker jenkins 
-                           exit
-                    docker rmi -f hotstar:v1 || true
-                    docker build -t hotstar:v1 -f /var/lib/jenkins/workspace/newproject/Dockerfile /var/lib/jenkins/workspace/newproject
-                '''
+                sh 'docker build -t mywebpage:latest .'
             }
         }
-
-        stage('Deploy Container') {
+        stage('Push Image') {
             steps {
-                sh '''
-                    docker rm -f con8 || true
-                    docker run -d --name con8 -p 8008:8080 hotstar:v1
-                '''
+                sh 'docker tag mywebpage:latest mydockerhubuser/mywebpage:latest'
+                sh 'docker push mydockerhubuser/mywebpage:latest'
             }
         }
-
+        stage('Deploy to Kubernetes') {
+            steps {
+                withKubeConfig([credentialsId: 'k8s-cred']) {
+                    sh 'kubectl apply -f k8s-deployment.yml'
+                }
+            }
+        }
     }
 }
