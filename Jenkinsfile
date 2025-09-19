@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from main branch
-                git branch: 'main', url: 'https://github.com/naga-143-ctr/newproject.git'
+                git branch: 'main', url: 'https://github.com/LakshayD02/Hotstar-Clone.git'
 
                 // Verify files
                 sh 'pwd'
